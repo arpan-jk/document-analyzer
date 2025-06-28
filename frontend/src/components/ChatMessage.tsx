@@ -32,9 +32,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         )}
       >
         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-        <p className="text-xs opacity-70 mt-2">
-          {message.timestamp.toLocaleTimeString()}
-        </p>
+       <p className="text-xs opacity-70 mt-2">
+        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+       </p>
+
       </div>
       {message.sender === 'user' && (
         <div className="flex-shrink-0 p-2 bg-gray-600 dark:bg-gray-500 rounded-full">

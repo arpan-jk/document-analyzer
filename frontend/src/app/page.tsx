@@ -120,13 +120,15 @@ export default function Home() {
       timestamp: new Date()
     };
 
+    let message_to_send = inputMessage;
+
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
 
     try {
       const result = await api.sendMessage({
-        message: inputMessage,
+        message: message_to_send,
         fileName: uploadedFile?.name || null
       });
       
@@ -292,7 +294,7 @@ export default function Home() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="flex-shrink-0 p-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
+                className="flex-shrink-0 mb-3 p-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
                 title="Upload PDF"
               >
                 {isUploading ? (
@@ -326,7 +328,7 @@ export default function Home() {
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="flex-shrink-0 p-3 bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-shrink-0 mb-3 p-3 bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Send message"
               >
                 <Send className="h-5 w-5" />
@@ -335,49 +337,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* Features Section - Only show when no file is uploaded */}
-      {!uploadedFile && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Document Analysis</h3>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Upload PDF documents and get intelligent analysis, summaries, and insights.
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <Bot className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">AI Chat</h3>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Ask questions about your documents and get instant, accurate responses.
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <Download className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Smart Extraction</h3>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Extract key information, tables, and data from complex documents.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
