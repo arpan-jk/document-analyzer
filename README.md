@@ -1,28 +1,14 @@
 # Document Analyzer
 
-A document analyzer application that uses local LLMs to process and analyze documents.
-
-## Overview
-
-This application consists of a frontend and backend that work together to analyze documents using local language models. The backend processes documents and the frontend provides a user interface for document upload and analysis.
-
-## Prerequisites
-
-- Node.js and npm
-- Python 3
-- Ollama (for local LLM)
+A document analyzer application that uses local LLMs to answer queries regarding pdfs uploaded.
 
 ## Setup
 
-### 1. Install Ollama and Model
+### 1. AI model setup
 
-```bash
-# Install Ollama
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull the required model
-ollama pull llama3.2:1b
-```
+1. go to [https://openrouter.ai/](https://openrouter.ai/)
+2. create your own api key
+3. use with the code [here](https://openrouter.ai/google/gemma-3n-e2b-it:free/api)
 
 ### 2. Frontend Setup
 
@@ -35,22 +21,18 @@ npm run dev
 ### 3. Backend Setup
 
 ```bash
-# Create virtual environment
 python3 -m venv venv
 
-# Activate virtual environment
 source venv/bin/activate
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Start the backend server
 uvicorn app.main:app --reload
 ```
+## References
 
-## Usage
-
-1. Start the backend server (step 3 above)
-2. Start the frontend development server (step 2 above)
-3. Open your browser and navigate to the frontend URL
-4. Upload and analyze your documents 
+1. FastApi Tutorial and Features: [link](https://fastapi.tiangolo.com/)
+2. Use google gemma : [link](https://openrouter.ai/google/gemma-3n-e2b-it:free/api)
+3. How to use ollama in fastapi : [link](https://www.byteplus.com/en/topic/556170)
+4. Pdf extraction in python : [link](https://pypdf2.readthedocs.io/en/3.0.0/user/extract-text.html)
+5. 
