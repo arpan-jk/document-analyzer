@@ -40,14 +40,36 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+
+  const setSessionId = () => {
+      let sessionId = localStorage.getItem('session_id');
+
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem('session_id', sessionId);
+      }
+      document.cookie = `session_id=${sessionId};`;
+      console.log("session-id: ",sessionId);
+  }
+
+
   useEffect(() => {
     const root = window.document.documentElement;
     const storedTheme = localStorage.getItem('theme');
+    
     if (storedTheme) {
       setTheme(storedTheme);
       root.classList.add(storedTheme);
     }
+
+    setSessionId();
+
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
 
   const toggleTheme = () => {
     const root = window.document.documentElement;
@@ -62,14 +84,43 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+
+  const handleFileDelete = async () => {
+    try {
+
+      if (fileInputRef.current) {
+       fileInputRef.current.value = '';
+      }
+
+      console.log("deleting ",uploadedFile?.name);
+      const result = await api.deleteFile(uploadedFile?.name);
+      
+      if (result.success) {
+        const newMessage: Message = {
+          id: Date.now().toString(),
+          content: result.message || `Successfully Deleted "${uploadedFile?.name}"`,
+          sender: 'bot',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, newMessage]);
+      } else {
+        throw new Error(result.message || 'Deletion failed');
+      }
+    } catch (error) {
+      console.error('Deletion error:', error);
+      alert('Failed to delete file. Please try again.');
+    } 
+    finally {
+       setUploadedFile(null);
+    }
+
+  }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+   
     if (file.type !== 'application/pdf') {
       alert('Please upload a PDF file');
       return;
@@ -81,24 +132,21 @@ export default function Home() {
       const result = await api.uploadFile(file);
       
       if (result.success) {
-        // Set file metadata locally from the File object
         setUploadedFile({
           name: file.name,
           size: file.size,
           type: file.type,
-          // preview: `data:application/pdf;base64,${btoa('dummy-pdf-content')}` // Local preview placeholder
-          preview: URL.createObjectURL(file) // Local preview placeholder
+          preview: URL.createObjectURL(file)
         });
         
-        // Add bot message confirming upload
         const newMessage: Message = {
           id: Date.now().toString(),
-          content: result.message || `✅ Successfully uploaded "${file.name}". I can now analyze this document for you. Ask me questions about its content!`,
+          content: result.message || `Successfully uploaded "${file.name}". I can now analyze this document for you. Ask me questions about its content!`,
           sender: 'bot',
           timestamp: new Date()
         };
         setMessages(prev => [...prev, newMessage]);
-        setShowPreview(true); // Show preview when file is uploaded
+        setShowPreview(true);
       } else {
         throw new Error(result.message || 'Upload failed');
       }
@@ -157,7 +205,7 @@ export default function Home() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleEnterPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -229,7 +277,7 @@ export default function Home() {
                     </div>
                   </div>
                   <button
-                    onClick={() => setUploadedFile(null)}
+                    onClick={() => handleFileDelete()}
                     className="p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                     title="Remove file"
                   >
@@ -316,7 +364,7 @@ export default function Home() {
                 <textarea
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyUp={handleKeyPress}
+                  onKeyUp={handleEnterPress}
                   placeholder="Ask me about your PDF document..."
                   className="w-full p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   rows={1}
